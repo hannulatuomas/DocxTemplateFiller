@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocX Template Filler</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <span class="header-icon">📄</span>
+      <h1>DocX Template Filler</h1>
+      <p>Upload a <code>.docx</code> template with <code>{{PLACEHOLDER}}</code> tags,<br>
+         fill in the values, and download your completed document.</p>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- STEP 1: UPLOAD -->
+    <section class="card" id="step-upload">
+      <div class="card-header">
+        <span class="badge">1</span>
+        <h2>Upload Template</h2>
+      </div>
+
+      <div class="dropzone" id="dropzone" tabindex="0" role="button"
+           aria-label="Click or drag a .docx file here">
+        <input type="file" id="file-input" accept=".docx" hidden />
+        <div class="dropzone-content" id="dropzone-content">
+          <span class="dz-icon">⬆</span>
+          <p class="dz-primary">Drop your <strong>.docx</strong> template here</p>
+          <p class="dz-secondary">or click to browse</p>
+        </div>
+      </div>
+
+      <div class="file-chip hidden" id="file-chip">
+        <span>📎</span>
+        <span id="file-name-display"></span>
+        <button class="icon-btn" id="btn-clear" title="Remove file">✕</button>
+      </div>
+
+      <div class="card-footer">
+        <a class="link-small" href="/example-template.docx" download>
+          ↓ Download example template
+        </a>
+        <button class="btn btn-primary" id="btn-parse" disabled>
+          Detect Placeholders →
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 2: FILL FIELDS -->
+    <section class="card hidden" id="step-fields">
+      <div class="card-header">
+        <span class="badge">2</span>
+        <h2>Fill in Values</h2>
+      </div>
+      <div id="fields-container" class="fields-grid"></div>
+      <div class="card-footer">
+        <button class="btn btn-ghost" id="btn-back">← Back</button>
+        <button class="btn btn-primary" id="btn-generate">
+          Generate Document ↓
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 3: DOWNLOAD -->
+    <section class="card hidden" id="step-done">
+      <div class="card-header">
+        <span class="badge badge-ok">✓</span>
+        <h2>Your Document is Ready!</h2>
+      </div>
+      <p class="done-msg">All placeholders replaced. Download your filled document below.</p>
+      <div class="card-footer">
+        <button class="btn btn-ghost" id="btn-restart">← Start Over</button>
+        <a class="btn btn-success" id="btn-download" download>⬇ Download Document</a>
+      </div>
+    </section>
+
+    <!-- ERROR BANNER -->
+    <div class="error-banner hidden" id="error-banner" role="alert">
+      <span>⚠️</span>
+      <span id="error-text"></span>
+      <button class="icon-btn" id="btn-error-close">✕</button>
+    </div>
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay hidden" id="loading-overlay">
+      <div class="spinner"></div>
+      <p id="loading-text">Processing…</p>
+    </div>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
