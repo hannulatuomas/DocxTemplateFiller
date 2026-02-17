@@ -1,4 +1,4 @@
-/* ─── Reset ──────────────────────────────────────────────────────────────── */
+/* Reset */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -28,7 +28,7 @@ body {
   line-height: 1.6;
 }
 
-/* ─── Layout ─────────────────────────────────────────────────────────────── */
+/* Layout */
 .app  { display: flex; flex-direction: column; min-height: 100vh; }
 .main {
   flex: 1;
@@ -39,7 +39,7 @@ body {
   position: relative;
 }
 
-/* ─── Header ─────────────────────────────────────────────────────────────── */
+/* Header */
 .header {
   background: linear-gradient(135deg, #4361ee 0%, #7b5ea7 100%);
   color: #fff;
@@ -52,7 +52,7 @@ body {
 .header p     { margin-top: .5rem; font-size: .94rem; opacity: .9; line-height: 1.7; }
 .header code  { background: rgba(255,255,255,.2); border-radius: 4px; padding: 1px 5px; }
 
-/* ─── Card ───────────────────────────────────────────────────────────────── */
+/* Card */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -84,7 +84,19 @@ body {
   flex-wrap: wrap;
 }
 
-/* ─── Badge ──────────────────────────────────────────────────────────────── */
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.hint {
+  font-size: .78rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Badge */
 .badge {
   width: 30px; height: 30px;
   border-radius: 50%;
@@ -96,7 +108,7 @@ body {
 }
 .badge-ok { background: var(--success); font-size: 1rem; }
 
-/* ─── Dropzone ───────────────────────────────────────────────────────────── */
+/* Dropzone */
 .dropzone {
   border: 2px dashed var(--border);
   border-radius: var(--radius-sm);
@@ -115,7 +127,7 @@ body {
 .dz-primary   { font-weight: 500; }
 .dz-secondary { font-size: .875rem; color: var(--muted); margin-top: .2rem; }
 
-/* ─── File chip ──────────────────────────────────────────────────────────── */
+/* File chip */
 .file-chip {
   display: flex;
   align-items: center;
@@ -134,12 +146,15 @@ body {
   word-break: break-all;
 }
 
-/* ─── Fields ─────────────────────────────────────────────────────────────── */
+/* Fields */
 .fields-grid { display: grid; gap: 1rem; }
 
 .field-group { display: flex; flex-direction: column; gap: .3rem; }
 
 .field-group label {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
   font-size: .775rem;
   font-weight: 700;
   letter-spacing: .05em;
@@ -147,7 +162,9 @@ body {
   color: var(--label-clr);
 }
 
-.field-group input {
+/* Shared styles for all input widgets */
+.field-group input,
+.field-group textarea {
   width: 100%;
   padding: .6rem .85rem;
   font-size: .95rem;
@@ -159,12 +176,37 @@ body {
   transition: border-color var(--transition), box-shadow var(--transition);
   outline: none;
 }
-.field-group input:focus {
+.field-group input:focus,
+.field-group textarea:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(67,97,238,.15);
 }
 
-/* ─── Buttons ────────────────────────────────────────────────────────────── */
+/* Textarea — vertical resize only */
+.field-group textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.55;
+}
+
+/* Date picker cursor */
+.field-group input[type="date"] { cursor: pointer; }
+
+/* Field type badge next to label */
+.field-type-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  background: #eef1ff;
+  color: var(--primary);
+  border: 1px solid #d5daff;
+}
+
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -203,6 +245,11 @@ body {
 }
 .btn-ghost:hover { background: var(--bg); color: var(--text); }
 
+.btn-sm {
+  padding: .35rem .85rem;
+  font-size: .82rem;
+}
+
 .btn-success {
   background: var(--success);
   color: #fff;
@@ -232,10 +279,53 @@ body {
 }
 .link-small:hover { color: var(--primary); }
 
-/* ─── Done section ───────────────────────────────────────────────────────── */
+/* Done section */
 .done-msg { color: var(--muted); margin-bottom: .25rem; }
 
-/* ─── Error banner ───────────────────────────────────────────────────────── */
+/* History panel */
+.history-icon { font-size: 1.2rem; }
+
+.history-list { display: flex; flex-direction: column; gap: .6rem; }
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .7rem .9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  transition: border-color var(--transition);
+}
+.history-item:hover { border-color: #c0c8f0; }
+
+.history-item__info {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  min-width: 0;
+}
+.history-item__name {
+  font-size: .9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.history-item__meta {
+  font-size: .78rem;
+  color: var(--muted);
+}
+
+.history-item__actions {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  flex-shrink: 0;
+}
+
+/* Error banner */
 .error-banner {
   display: flex;
   align-items: center;
@@ -251,7 +341,7 @@ body {
 }
 .error-banner span:nth-child(2) { flex: 1; }
 
-/* ─── Loading overlay ────────────────────────────────────────────────────── */
+/* Loading overlay */
 .loading-overlay {
   position: fixed; inset: 0;
   background: rgba(255,255,255,.72);
@@ -271,13 +361,16 @@ body {
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─── Utility ────────────────────────────────────────────────────────────── */
+/* Utility */
 .hidden { display: none !important; }
 
-/* ─── Responsive ─────────────────────────────────────────────────────────── */
+/* Responsive */
 @media (max-width: 520px) {
   .card { padding: 1.25rem; }
   .header h1 { font-size: 1.4rem; }
   .card-footer { flex-direction: column-reverse; }
+  .footer-right { width: 100%; justify-content: space-between; }
   .btn, .link-small { width: 100%; text-align: center; justify-content: center; }
+  .history-item { flex-direction: column; align-items: flex-start; }
+  .history-item__actions { width: 100%; justify-content: flex-end; }
 }

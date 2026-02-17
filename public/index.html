@@ -55,6 +55,15 @@
       </div>
     </section>
 
+    <!-- HISTORY -->
+    <section class="card hidden" id="history-section">
+      <div class="card-header">
+        <span class="history-icon">🕘</span>
+        <h2>Recent Templates</h2>
+      </div>
+      <div id="history-list" class="history-list"></div>
+    </section>
+
     <!-- STEP 2: FILL FIELDS -->
     <section class="card hidden" id="step-fields">
       <div class="card-header">
@@ -64,9 +73,12 @@
       <div id="fields-container" class="fields-grid"></div>
       <div class="card-footer">
         <button class="btn btn-ghost" id="btn-back">← Back</button>
-        <button class="btn btn-primary" id="btn-generate">
-          Generate Document ↓
-        </button>
+        <div class="footer-right">
+          <span class="hint" id="textarea-hint" hidden>Ctrl+Enter to generate</span>
+          <button class="btn btn-primary" id="btn-generate">
+            Generate Document ↓
+          </button>
+        </div>
       </div>
     </section>
 

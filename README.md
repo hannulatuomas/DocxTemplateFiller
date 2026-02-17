@@ -8,9 +8,14 @@ A lightweight web application that fills `{{PLACEHOLDER}}` tags in Word document
 
 - Drag-and-drop or click-to-browse `.docx` upload
 - Automatic detection of all `{{PLACEHOLDER}}` tags in the template
-- Dynamically generated input form — one field per placeholder found
+- Dynamically generated form with **smart field types** based on placeholder naming:
+  - Keys ending in `_DATE` → native date picker
+  - Keys ending in `_TEXT` or `_BODY` → multi-line textarea
+  - Everything else → single-line text input
+- **Template history** — the last 10 used templates and their values are saved in `localStorage` and can be reused with one click
 - Downloads a filled `.docx` that preserves the original formatting, styles, tables, and layout
 - All processing is in-memory — no files written to disk
+- **REST API** for programmatic use (see below)
 
 ---
 
@@ -55,7 +60,7 @@ docx-template-filler/
 ├── package.json
 ├── public/
 │   ├── index.html            # Single-page UI
-│   ├── style.css             # Styles
+│   ├── style.css
 │   ├── app.js                # Frontend logic
 │   └── example-template.docx
 ```
@@ -69,51 +74,125 @@ Write your template in Microsoft Word and use double-curly-brace tags anywhere y
 ```
 Contract date: {{DATE}}
 Client: {{CLIENT_NAME}}
+Project description: {{PROJECT_BODY}}
 Total value: {{CONTRACT_VALUE}} EUR
 ```
 
 **Tag naming rules:**
+
+| Suffix | Widget rendered | Example |
+|---|---|---|
+| `_DATE` | Date picker | `{{SIGNING_DATE}}` |
+| `_TEXT` | Multi-line textarea | `{{NOTES_TEXT}}` |
+| `_BODY` | Multi-line textarea | `{{PROJECT_BODY}}` |
+| *(anything else)* | Single-line text | `{{CLIENT_NAME}}` |
+
+Additional rules:
 - Letters, numbers, and underscores only: `{{PROJECT_NAME}}`, `{{VAT_ID}}`
 - Tags are case-sensitive: `{{Name}}` and `{{NAME}}` are treated as separate placeholders
 - Tags can appear in the document body, headers, and footers
 
-An example template (`public/example-template.docx`) is included and also served at `http://localhost:3000/example-template.docx`.
+An example template (`public/example-template.docx`) is included and served at `http://localhost:3000/example-template.docx`.
 
 ---
 
-## API
+## Template History
 
-The backend exposes two JSON endpoints consumed by the frontend. They can also be called directly for programmatic use.
+After each successful document generation the template name, placeholder list, and all entered values are saved to `localStorage` (browser-local, never sent to a server). On the upload screen, a **Recent Templates** panel shows the last 10 entries. Clicking **Reuse values** pre-fills all matching fields in the current session — useful when generating the same document type repeatedly with small changes.
+
+History entries can be individually deleted with the ✕ button and persist across browser sessions.
+
+---
+
+## REST API
+
+The backend exposes two endpoints that can be called directly for programmatic or scripted use — no authentication required when running locally.
 
 ### `POST /api/parse`
 
-Detect all placeholders in a template.
+Detect all `{{PLACEHOLDER}}` tags in a template.
 
-**Request:** `multipart/form-data` with field `template` (`.docx` file)
+**Request:** `multipart/form-data`
 
-**Response:**
+| Field | Type | Description |
+|---|---|---|
+| `template` | file | The `.docx` template |
+
+**Response `200`:**
 ```json
 {
   "placeholders": ["CLIENT_NAME", "CONTRACT_VALUE", "DATE"]
 }
 ```
 
+**Response `422`** — no tags found in the document.  
+**Response `400`** — no file uploaded or wrong file type.
+
+---
+
 ### `POST /api/generate`
 
-Fill the template and return the completed document.
+Fill the template and stream back the completed document.
 
-**Request:** `multipart/form-data` with fields:
-- `template` — the `.docx` template file
-- `values` — JSON string mapping placeholder names to replacement values
+**Request:** `multipart/form-data`
+
+| Field | Type | Description |
+|---|---|---|
+| `template` | file | The `.docx` template |
+| `values` | string | JSON object mapping placeholder names to replacement values |
+
+**Response `200`:** `application/vnd.openxmlformats-officedocument.wordprocessingml.document`  
+The filled `.docx` binary. Filename is provided via the `Content-Disposition` header.
+
+**Response `400`** — missing file or malformed `values` JSON.  
+**Response `500`** — template rendering error.
+
+---
+
+### curl examples
 
 ```bash
+# Detect placeholders
+curl -s -X POST http://localhost:3000/api/parse \
+  -F "template=@my-template.docx" | jq .
+
+# Generate a filled document
 curl -X POST http://localhost:3000/api/generate \
   -F "template=@my-template.docx" \
-  -F 'values={"DATE":"2025-06-01","CLIENT_NAME":"Acme Oy"}' \
+  -F 'values={"DATE":"2025-06-01","CLIENT_NAME":"Acme Oy","CONTRACT_VALUE":"15000"}' \
   -o filled.docx
 ```
 
-**Response:** `.docx` binary with `Content-Disposition: attachment` header.
+### Python example
+
+```python
+import requests, json
+
+BASE = "http://localhost:3000"
+
+# Step 1 — discover placeholders
+with open("my-template.docx", "rb") as f:
+    placeholders = requests.post(
+        f"{BASE}/api/parse", files={"template": f}
+    ).json()["placeholders"]
+
+print("Placeholders:", placeholders)
+
+# Step 2 — fill and save
+values = {"DATE": "2025-06-01", "CLIENT_NAME": "Acme Oy", "CONTRACT_VALUE": "15 000"}
+
+with open("my-template.docx", "rb") as f:
+    resp = requests.post(
+        f"{BASE}/api/generate",
+        files={"template": f},
+        data={"values": json.dumps(values)}
+    )
+
+with open("filled.docx", "wb") as out:
+    out.write(resp.content)
+
+print("Saved filled.docx")
+```
 
 ---
 
